@@ -1,6 +1,6 @@
-# UART - RTL Desing and UVM Verification
+# UART - RTL Design and UVM Verification
 A UART (Universal Asynchronous Receiver-Transmitter) transmitter/receiver pair implemented in SystemVerilog, 
-verified with a full UVM (Universal Verification Methology) 
+verified with a full UVM (Universal Verification Methodology) 
 testbench and simulated in Xilinx Vivado (Xsim).
 
 ## Overview
@@ -16,7 +16,7 @@ Idle   Start   D0  D1  D2  D3  D4  D5  D6  D7    Idle
 ```
 - Line idles high (`1`).
 - A falling edge (`0`).
-- 8 data bits follow, ** LSB firts **.
+- 8 data bits follow, ** LSB first **.
 - The line returns to `1` (stop condition).
 
 ## RTL Architecture 
@@ -25,7 +25,7 @@ Idle   Start   D0  D1  D2  D3  D4  D5  D6  D7    Idle
 |---|---|
 |`uart_top` | Top-level wrapper instantiating `uart_tx` and `uart_rx`, sharing `clk`/`rst`. |
 |`uart_tx` | Transmitter FSM (`Idle` -> `transfer`). Captures `tx_data` on `newd`, shifts it out LSB-first on `tx`, asserts `done_tx` on completion.|
-|`uart_rx` | Receiver FMS (`Idle` -> `start`). Detects the start bit on `rx`, reconstructs the byte via a shift register, asserts `done_rx` on completation|
+|`uart_rx` | Receiver FSM (`Idle` -> `start`). Detects the start bit on `rx`, reconstructs the byte via a shift register, asserts `done_rx` on completion|
 
 ### Parameters 
 
@@ -37,7 +37,7 @@ Idle   Start   D0  D1  D2  D3  D4  D5  D6  D7    Idle
 Internally, `clkcount = clk_freq / baud_rate` determines how many system clock cycles form one UART bit-time; each TX/RX module derives its own internal bit-clock
 (`uclk`) by toggling every `clkcount/2` cycles.
 
-## UVM Verification Enviroment
+## UVM Verification Environment
 
 ```
 uart_test
@@ -60,10 +60,10 @@ uart_test
 |`uart_sequence` | Generates a configurable number of randomized transaction via `start_item()`/`finish_item()`.|
 |`uart_driver` | Drives the interface according to `op`: pulses `newd`/`tx_data` for a transmit, or bit-bangs `rx` for a simulated receive. Publishes what it drove via its own analysis_port|
 |`uart_monitor`| Passively observes vif (no driving), reconstructs the byte seen on `tx` or `rx_data`, and publishes it via analysis_port|
-|`uart_scoreboart`| Receives from both driver and monitor (via `uvm_analysis_imp_decl(_drv/mon)), queues expected values per operation type, and compares them against observed values|
+|`uart_scoreboard`| Receives from both driver and monitor (via `uvm_analysis_imp_decl(_drv/mon)), queues expected values per operation type, and compares them against observed values|
 |`uart_agent`| bundles sequencer + driver + monitor|
 |`uart_env`| bundles agent + scoreboard, wires up the analysis ports.|
-|`uart_test`| configures and starts the sequence; maneges `raise_objections`/`drop_objection`|
+|`uart_test`| configures and starts the sequence; manages `raise_objections`/`drop_objection`|
 
 ## Repository Structure
 
